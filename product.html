@@ -1,0 +1,108 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="product.css">
+</head>
+<body class="">
+    
+    <div class="container">
+        <header>
+            <h1>Shopping Cart</h1>
+            <div class="shopping">
+                <img src="cart.png">
+                <span class="quantity">0</span>
+            </div>
+        </header>
+
+        <div class="list" id="product-list">
+            <!-- Products will be dynamically added here -->
+        </div>
+    </div>
+    <div class="card">
+        <h1>Cart</h1>
+        <ul class="listCard">
+        </ul>
+        <div class="checkOut">
+            <div class="total">0</div>
+            <button id="checkout">Checkout</button>
+            <!-- Added checkout button -->
+            <div class="closeShopping">Close</div>
+        </div>
+    </div>
+
+    <!-- Modal dialog for checkout details -->
+    <!-- Existing product.html content -->
+
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Checkout Details</h2>
+            <p>Total Price: <span id="checkout-total"></span></p>
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address">
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" name="phone">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email">
+            <button id="complete-purchase">Complete Purchase</button>
+            <button id="close-checkout">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to generate receipt content and save checkout details
+        function generateReceipt() {
+            var total = document.getElementById('checkout-total').textContent;
+            var address = document.getElementById('address').value;
+            var phone = document.getElementById('phone').value;
+            var email = document.getElementById('email').value;
+            var totalQuantity = document.querySelector('.quantity').textContent;
+
+            // Send the checkout details to the server
+            fetch('product.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `total_price=${total}&total_quantity=${totalQuantity}&address=${address}&phone=${phone}&email=${email}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Checkout details saved:', data);
+                // Handle successful checkout (e.g., show confirmation message)
+            })
+            .catch(error => {
+                console.error('Error saving checkout details:', error);
+                // Handle error (e.g., show error message)
+            });
+
+            // Generate and return the receipt content
+            var receiptContent = `Receipt\n\nTotal Price: ${total}\nAddress: ${address}\nPhone: ${phone}\nEmail: ${email}`;
+            return receiptContent;
+        }
+
+        // Event listener for the "Complete Purchase" button
+        document.getElementById('complete-purchase').addEventListener('click', function() {
+            var receiptContent = generateReceipt();
+            var blob = new Blob([receiptContent], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'receipt.txt';
+            document.body.appendChild(a)
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    </script>
+    <script src="product.js"></script>
+</body>
+</html>

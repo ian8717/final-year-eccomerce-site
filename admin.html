@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lighting Company Admin Dashboard</title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="admin.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <h1>Admin Dashboard</h1>
+        <nav class="admin-nav">
+            <ul>
+                <li><a href="#bookings">Bookings</a></li>
+                <li><a href="#orders">Orders</a></li>
+                <li><a href="#product-catalogue">Product Catalogue</a></li>
+                <li><a href="#enquiries">Enquiries</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="admin-main">
+        <section class="dashboard-section" id="bookings">
+            <h2>Bookings</h2>
+            <!-- PHP code to fetch and display bookings -->
+            <?php
+            // Database connection
+            $servername = "localhost";
+            $username = "root";
+            $password = "";
+            $database = "ian";
+                    
+            $conn = new mysqli($servername, $username, $password, $database);
+                    
+            // Check connection
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+            
+            // Fetch bookings
+            $bookingsSql = "SELECT * FROM booking_data";
+            $bookingsResult = $conn->query($bookingsSql);
+            
+            echo "<table>";
+            echo "<tr><th>Name</th><th>Date</th><th>Time</th><th>Need Fixtures</th><th>Location</th><th>Description</th><th>Category</th></tr>";
+            while ($booking = $bookingsResult->fetch_assoc()) {
+                echo "<tr>";
+                echo "<td>{$booking['name']}</td>";
+                echo "<td>{$booking['date']}</td>";
+                echo "<td>{$booking['time']}</td>";
+                echo "<td>{$booking['need_fixtures']}</td>";
+                echo "<td>{$booking['location']}</td>";
+                echo "<td>{$booking['description']}</td>";
+                echo "<td>{$booking['category']}</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+            
+            // Close connection
+            $conn->close();
+            ?>
+        </section>
+        
+
+        <section class="dashboard-section" id="orders">
+            <h2>Orders</h2>
+            <!-- PHP code to fetch and display orders -->
+            <?php
+            // Database connection
+            $servername = "localhost";
+            $username = "root";
+            $password = "";
+            $database = "ian";
+        
+            $conn = new mysqli($servername, $username, $password, $database);
+        
+            // Check connection
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+        
+            // Fetch orders
+            $ordersSql = "SELECT * FROM checkout_details";
+            $ordersResult = $conn->query($ordersSql);
+        
+            if ($ordersResult && $ordersResult->num_rows > 0) {
+                echo "<table>";
+                echo "<tr><th>Order ID</th><th>Product ID</th><th>Quantity</th><th>Total Price</th><th>Order Date</th><th>Receipt</th></tr>";
+                while ($order = $ordersResult->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . (isset($order['order_id']) ? $order['order_id'] : "") . "</td>";
+                    echo "<td>" . (isset($order['product_id']) ? $order['product_id'] : "") . "</td>";
+                    echo "<td>" . (isset($order['quantity']) ? $order['quantity'] : "") . "</td>";
+                    echo "<td>" . (isset($order['total_price']) ? $order['total_price'] : "") . "</td>";
+                    echo "<td>" . (isset($order['order_date']) ? $order['order_date'] : "") . "</td>";
+                    // Add a new column for the receipt download link
+                    echo "<td><a href='download_receipt.php?order_id=" . (isset($order['order_id']) ? $order['order_id'] : "") . "'>Download Receipt</a></td>";
+                    echo "</tr>";
+                }
+                echo "</table>";
+            } else {
+                echo "No orders found.";
+            }
+        
+            // Close connection
+            $conn->close();
+            ?>
+        </section>
+        
+
+
+        
+
+
+        <section class="dashboard-section" id="product-catalogue">
+            <h2>Product Catalogue</h2>
+            <!-- PHP code to fetch and display product catalogue -->
+            <?php
+            // Database connection
+            $servername = "localhost";
+            $username = "root";
+            $password = "";
+            $database = "ian";
+
+            $conn = new mysqli($servername, $username, $password, $database);
+
+            // Check connection
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+
+            // Fetch products
+$productsSql = "SELECT * FROM products";
+$productsResult = $conn->query($productsSql);
+
+echo "<h2>Product Catalogue</h2>";
+echo "<table>";
+echo "<tr><th>Name</th><th>Price</th><th>Quantity</th><th>Image</th></tr>";
+while ($product = $productsResult->fetch_assoc()) {
+    echo "<tr>";
+    echo "<td>{$product['name']}</td>";
+    echo "<td>{$product['price']}</td>";
+    echo "<td>{$product['quantity']}</td>";
+    echo "<td><img src='{$product['image_path']}' alt='{$product['name']}'  width='100' height='100'></td>";
+    echo "</tr>";
+}
+echo "</table>";
+
+            // Close connection
+            $conn->close();
+            ?>
+
+            <button onclick="toggleForm()">Add Product</button>
+            <div id="addProductForm" style="display: none;">
+                <form action="add_product.php" method="post" enctype="multipart/form-data">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required><br>
+                    <label for="price">Price:</label>
+                    <input type="number" id="price" name="price" required><br>
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" required><br>
+                    <label for="image">Image:</label>
+                    <input type="file" id="image" name="image" accept="image/*" required><br>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
+
+        </section>
+
+        <section class="dashboard-section" id="enquiries">
+            <h2>Reviews</h2>
+            <!-- PHP code to fetch and display enquiries -->
+            <?php
+            // Database connection
+            $servername = "localhost";
+            $username = "root";
+            $password = "";
+            $database = "ian";
+        
+            $conn = new mysqli($servername, $username, $password, $database);
+        
+            // Check connection
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+        
+            // Fetch enquiries
+            $enquiriesSql = "SELECT * FROM contact_inquiries";
+            $enquiriesResult = $conn->query($enquiriesSql);
+        
+            echo "<table>";
+            echo "<tr><th>Name</th><th>Email</th><th>Phone</th><th>Message</th><th>Inquiry Date</th></tr>";
+            while ($enquiry = $enquiriesResult->fetch_assoc()) {
+                echo "<tr>";
+                echo "<td>{$enquiry['name']}</td>";
+                echo "<td>{$enquiry['email']}</td>";
+                echo "<td>{$enquiry['phone']}</td>";
+                echo "<td>{$enquiry['message']}</td>";
+                echo "<td>{$enquiry['inquiry_date']}</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+        
+            // Close connection
+            $conn->close();
+            ?>
+        </section>
+        
+
+        
+    </main>
+
+    <!-- Link to external JavaScript file -->
+    <script>
+        function toggleForm() {
+            var form = document.getElementById("addProductForm");
+            if (form.style.display === "none") {
+                form.style.display = "block";
+            } else {
+                form.style.display = "none";
+            }
+        }
+        </script>
+    <script src="admin.js"></script>
+</body>
+</html>

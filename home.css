@@ -1,0 +1,39 @@
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+}
+
+header {
+	background-color: #333;
+	color: white;
+	padding: 1rem;
+    background-image: url(home.jpg);
+}
+
+.grid-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 2rem;
+	padding: 2rem;
+}
+
+.grid-item {
+	background-color: #f1f1f13f;
+	padding: 1rem;
+	border-radius: 5px;
+}
+
+h1, h2 {
+	color: #333;
+}
+
+@media (max-width: 600px) {
+	.grid-container {
+		padding: 1rem;
+	}
+
+	.grid-item {
+		padding: 1rem;
+	}
+}
